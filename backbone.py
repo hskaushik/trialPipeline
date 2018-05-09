@@ -2,8 +2,8 @@ from __future__ import division
 import sys
 import os
 import csv
-from functions import *
-# from pdbEditor import topOccupancy
+# from functions import *
+from pdbEditor import topOccupancy
 
 if (__name__ == "__main__"):
     # topOccupancy("/home/ksh40/work/trial_runs/2od6/runs/pc/SADphaser/2od6_pc_mrSAD.1.pdb")
