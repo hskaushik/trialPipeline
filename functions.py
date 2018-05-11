@@ -1,5 +1,9 @@
 ##Data Generating functions
 def runAutosol(mtz, seq, subStruc, atom_type, wave_length,path):
+    '''
+    This function runs Autosol.  Depending on whether a substructure is
+    provided or not, it would run on either default or positive control mode
+    '''
     from phenix.command_line import autosol
     print("the current path is: "+path)
     if subStruc is None:
@@ -9,6 +13,9 @@ def runAutosol(mtz, seq, subStruc, atom_type, wave_length,path):
 
 ##SAD phaser
 def runSADphaser(mtz,pdbid,PDB,seq, atom_type, wave_length,path) :
+    '''
+    This function runs LLG completion starting from a (partial) substructure
+    '''
     from phaser import *
     from cctbx import xray
     print("the current path is: "+path)
@@ -53,6 +60,11 @@ def runSADphaser(mtz,pdbid,PDB,seq, atom_type, wave_length,path) :
 
 ##this runs the MR_SAD
 def runMRsad(mtz,pdbid,PDB,seq,atom_type,wave_length,path) :
+    '''
+    This function runs MRsad starting from final refined PDB model to generate
+    a substructure.  Note: the atom type is "AX" which accounts for imaginary
+    contribution of a atom.
+    '''
     from cStringIO import StringIO
     import pickle
     from phaser import *
@@ -101,23 +113,16 @@ def runMRsad(mtz,pdbid,PDB,seq,atom_type,wave_length,path) :
         f=open(path+'.log','w')
         f.write(r.logfile())
         f.close()
-
-
-        ##load r object into pickle file
-        # with open("result.pkl", "w") as result:
-        #     pickle.dump(r,result)
-        #use the following to retrieve the pickle
-        #result=pickle.load(open("result.pkl", "rb"))
     else:
         print "Job exit status FAILURE"
         print r.ErrorName(), "ERROR :", r.ErrorMessage()
-    # sys.stdout=original
     return;
-    #this can be run by following command
-    #runMRsad("/home/ksh40/work/lysozyme/3abc/anomalous/french_wilson.mtz","3abc","/home/ksh40/work/lysozyme/lyso_SSAD/refined18_lysozyme.pdb","/home/ksh40/work/lysozyme/lyso_SSAD/seq.fa",1.54)
 
 ##this code will run Phassade
 def runPhassade(mtz,pdbid,seq, atom_type, wave_length,path) :
+    '''
+    This code runs phassade - the single atoms placement protocol
+    '''
     from phaser import *
     from cctbx import xray
     path=path
@@ -162,6 +167,9 @@ def runPhassade(mtz,pdbid,seq, atom_type, wave_length,path) :
 
 ##this code will run Shelx pipeline
 def runShelx(mtz,pdbid,seq,atom_type,wave_length,solvent_content,resolution,path):
+    '''
+    This function runs Shelx C/D/E pipeline starting from structure factors
+    '''
     import os
     assert os.path.isfile(mtz)
     from iotbx import crystal_symmetry_from_any
@@ -199,6 +207,9 @@ def runShelx(mtz,pdbid,seq,atom_type,wave_length,solvent_content,resolution,path
 
 ##Analysing functions
 def runEmma(referencePDB, currentPDB,path):
+    '''
+    This function compares two substructures
+    '''
     from iotbx import crystal_symmetry_from_any
     import iotbx.pdb
     from iotbx.cns import sdb_reader
@@ -211,11 +222,19 @@ def runEmma(referencePDB, currentPDB,path):
     emma.run(referencePDB, currentPDB)
 
 def runCC_MTZ_PDB(currentMTZ, referencePDB,path):
+    '''
+    This function generates correlation coefficient by comparing structure
+    factors against a PDB model
+    '''
     from phenix.command_line import get_cc_mtz_pdb
     print("this is currentMTZ: ", currentMTZ)
     print("this is referencePDB: ", referencePDB)
     obj=get_cc_mtz_pdb.get_cc_mtz_pdb([currentMTZ, referencePDB])
 
 def runExpand2P1(PDB):
+    '''
+    This function was provided by Rober Offner.  It expands the structure into
+    P1 space group.
+    '''
     import ExpandASU
     ExpandASU.ExpandASUToP1(PDB, 1, 1, 1, 0)

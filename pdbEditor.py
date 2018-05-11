@@ -1,6 +1,10 @@
 ##Data Generating functions
 ##the following atoms2pdb function was written by Rob
 def atoms2pdb(atoms):
+    '''
+    This function was written by Robert Offner.  It constructs a PDB hierarchy
+    from a given list of atoms
+    '''
     import os, sys
     from iotbx import pdb
     from iotbx.pdb import hierarchy
@@ -46,15 +50,30 @@ def topOccupancy(PDB):
         print("occupancy is lower than 0.1")
 
 def sortOccupancy(PDB):
+    '''
+    This function generates PDB file of atoms having better than 0.5 occupancy.
+    It sorts the atoms according to the decending order of their occupancy and
+    writes a pair atoms from combination of top 5 atoms into separate PDB files.
+    '''
     import os, sys
     from iotbx import pdb
     from iotbx.pdb import hierarchy
+    import itertools
     mylist=[]
     pdb_in = hierarchy.input(PDB)
     symm=pdb_in.crystal_symmetry()
     obj_pdb=pdb_in.construct_hierarchy()
     selected_atoms=obj_pdb.atom_selection_cache().iselection("occupancy>0.5")
-    for e in selected_atoms:
-        mylist.append(obj_pdb.atoms()[e])
-    sorted_atoms=sorted(mylist, key=lambda thisatom:thisatom.occ, reverse=True)
-    atoms2pdb(sorted_atoms).write_pdb_file(file_name="manga.pdb")
+    if (len(selected_atoms)>1):
+        for e in selected_atoms:
+            mylist.append(obj_pdb.atoms()[e])
+        sorted_atoms=sorted(mylist, key=lambda thisatom:thisatom.occ, reverse=True)
+        atoms2pdb(sorted_atoms).write_pdb_file(file_name="topOcc_.pdb")
+        ##the following list will generate the combination of the top 5 atoms
+        iterableList=itertools.combinations(sorted_atoms[0:5],2)
+        counter=int(1)
+        for e in list(iterableList):
+            atoms2pdb(e).write_pdb_file(file_name="combination"+str(counter)+"_.pdb")
+            counter=counter+1
+    else:
+        print("occupancy is lower than 0.5")
