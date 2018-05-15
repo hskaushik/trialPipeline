@@ -1,3 +1,4 @@
+
 ##Data Generating functions
 def runAutosol(mtz, seq, subStruc, atom_type, wave_length,path):
     '''
@@ -12,51 +13,104 @@ def runAutosol(mtz, seq, subStruc, atom_type, wave_length,path):
         obj=autosol.run_autosol ([mtz, seq, subStruc, atom_type, "lambda=%f" %wave_length])
 
 ##SAD phaser
-def runSADphaser(mtz,pdbid,PDB,seq, atom_type, wave_length,path) :
+def runSADphaser(mtz,pdbid,PDB,seq, atom_type, wave_length,path,dir_path) :
     '''
     This function runs LLG completion starting from a (partial) substructure
     '''
     from phaser import *
     from cctbx import xray
-    print("the current path is: "+path)
-    i = InputEP_DAT()
-    HKLIN = mtz
-    xtalid = pdbid
-    waveid = "cuka"
-    lamda=wave_length
-    i.setHKLI(HKLIN)
-    i.addCRYS_ANOM_LABI(xtalid,waveid,"F(+)","SIGF(+)","F(-)","SIGF(-)")
-    i.setMUTE(False)
-    r = runEP_DAT(i)
-    if r.Success():
-        hkl = r.getMiller()
-        Fpos = r.getFpos(xtalid,waveid)
-        Spos = r.getSIGFpos(xtalid,waveid)
-        Ppos = r.getPpos(xtalid,waveid)
-        Fneg = r.getFneg(xtalid,waveid)
-        Sneg = r.getSIGFneg(xtalid,waveid)
-        Pneg = r.getPneg(xtalid,waveid)
-        i = InputEP_AUTO()
-        i.setSPAC_HALL(r.getSpaceGroupHall())
-        i.setWAVE(lamda)
-        i.setCELL6(r.getUnitCell())
-        i.setCRYS_MILLER(hkl)
-        i.addCRYS_ANOM_DATA(xtalid,waveid,Fpos,Spos,Ppos,Fneg,Sneg,Pneg)
-        i.setATOM_PDB(xtalid,PDB)
-        i.setLLGC_COMP(True)
-        i.addLLGC_SCAT(atom_type)
-        i.addCOMP_PROT_SEQ_NUM(seq,1.)
-        i.setTITL(xtalid+path)
-        i.setROOT(xtalid+path)
-        r = runEP_AUTO(i)
-        f=open(path+'.log','w')
-        f.write(r.logfile())
-        f.close()
-        print "LogLikelihood = " , r.getLogLikelihood()
-    else:
-        print "Job exit status FAILURE"
-        print r.ErrorName(), "ERROR :", r.ErrorMessage()
-    return;
+    if dir_path is None:
+        ##run outside
+        print("the current path is: "+path)
+        i = InputEP_DAT()
+        HKLIN = mtz
+        xtalid = pdbid
+        waveid = "cuka"
+        lamda=wave_length
+        i.setHKLI(HKLIN)
+        i.addCRYS_ANOM_LABI(xtalid,waveid,"F(+)","SIGF(+)","F(-)","SIGF(-)")
+        i.setMUTE(False)
+        r = runEP_DAT(i)
+        if r.Success():
+            hkl = r.getMiller()
+            Fpos = r.getFpos(xtalid,waveid)
+            Spos = r.getSIGFpos(xtalid,waveid)
+            Ppos = r.getPpos(xtalid,waveid)
+            Fneg = r.getFneg(xtalid,waveid)
+            Sneg = r.getSIGFneg(xtalid,waveid)
+            Pneg = r.getPneg(xtalid,waveid)
+            i = InputEP_AUTO()
+            i.setSPAC_HALL(r.getSpaceGroupHall())
+            i.setWAVE(lamda)
+            i.setCELL6(r.getUnitCell())
+            i.setCRYS_MILLER(hkl)
+            i.addCRYS_ANOM_DATA(xtalid,waveid,Fpos,Spos,Ppos,Fneg,Sneg,Pneg)
+            i.setATOM_PDB(xtalid,PDB)
+            i.setLLGC_COMP(True)
+            i.addLLGC_SCAT(atom_type)
+            i.addCOMP_PROT_SEQ_NUM(seq,1.)
+            i.setTITL(xtalid+path)
+            i.setROOT(xtalid+path)
+            r = runEP_AUTO(i)
+            f=open(path+'.log','w')
+            f.write(r.logfile())
+            f.close()
+            print "LogLikelihood = " , r.getLogLikelihood()
+        else:
+            print "Job exit status FAILURE"
+            print r.ErrorName(), "ERROR :", r.ErrorMessage()
+        return;
+
+    elif dir_path is not None:
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        os.chdir(dir_path)
+        print("the current path is: "+path)
+        i = InputEP_DAT()
+        HKLIN = mtz
+        xtalid = pdbid
+        waveid = "cuka"
+        lamda=wave_length
+        i.setHKLI(HKLIN)
+        i.addCRYS_ANOM_LABI(xtalid,waveid,"F(+)","SIGF(+)","F(-)","SIGF(-)")
+        i.setMUTE(False)
+        r = runEP_DAT(i)
+        if r.Success():
+            hkl = r.getMiller()
+            Fpos = r.getFpos(xtalid,waveid)
+            Spos = r.getSIGFpos(xtalid,waveid)
+            Ppos = r.getPpos(xtalid,waveid)
+            Fneg = r.getFneg(xtalid,waveid)
+            Sneg = r.getSIGFneg(xtalid,waveid)
+            Pneg = r.getPneg(xtalid,waveid)
+            i = InputEP_AUTO()
+            i.setSPAC_HALL(r.getSpaceGroupHall())
+            i.setWAVE(lamda)
+            i.setCELL6(r.getUnitCell())
+            i.setCRYS_MILLER(hkl)
+            i.addCRYS_ANOM_DATA(xtalid,waveid,Fpos,Spos,Ppos,Fneg,Sneg,Pneg)
+            i.setATOM_PDB(xtalid,PDB)
+            i.setLLGC_COMP(True)
+            i.addLLGC_SCAT(atom_type)
+            i.addCOMP_PROT_SEQ_NUM(seq,1.)
+            i.setTITL(xtalid+path)
+            i.setROOT(xtalid+path)
+            r = runEP_AUTO(i)
+            f=open(path+'.log','w')
+            f.write(r.logfile())
+            f.close()
+        else:
+            print "Job exit status FAILURE"
+            print r.ErrorName(), "ERROR :", r.ErrorMessage()
+        return;
+
+def multi_run_wrapper(args):
+    """
+    This function is a wrapper to carryout multi processing.  This wrapper takes a list of
+    arguments and hands it individually to runSADphaser()
+    """
+    print ("we are inside the wrapper")
+    return runSADphaser(*args)
 
 ##this runs the MR_SAD
 def runMRsad(mtz,pdbid,PDB,seq,atom_type,wave_length,path) :
@@ -119,10 +173,11 @@ def runMRsad(mtz,pdbid,PDB,seq,atom_type,wave_length,path) :
     return;
 
 ##this code will run Phassade
-def runPhassade(mtz,pdbid,seq, atom_type, wave_length,path) :
-    '''
+def runPhassade(mtz,pdbid,seq,atom_type,wave_length,path) :
+    """
     This code runs phassade - the single atoms placement protocol
-    '''
+    """
+    print("entered the phassade function")
     from phaser import *
     from cctbx import xray
     path=path
