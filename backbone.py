@@ -23,15 +23,17 @@ if (__name__ == "__main__"):
             wave_length=float(row['wave_length'])
             solvent_content=float(row['solvent_content'])
             resolution=float(row['resolution'])
-            nproc=10 # number of CPUs to be used for parallel processing
+            nproc=int(10) # number of CPUs to be used for parallel processing
 
             ##define variables with paths
             PDB=os.path.join(home_path,pdbid+".pdb")
             seq=os.path.join(home_path,pdbid+".fa")
             mtz=os.path.join(home_path,pdbid+".mtz")
+            subStruc=os.path.join(home_path,"subStruc.pdb")
             print("path to PDB model file: "+PDB)
             print("path to sequence fasta file : "+seq)
             print("path to FW pre-converted MTZ file : "+mtz)
+            print("path to original substructure is : "+subStruc)
 
     dirs = (
         ["runs"],
@@ -55,7 +57,7 @@ if (__name__ == "__main__"):
         if path_name=="_pc_mrSAD":
             ##run mrSAD
             try:
-                runMRsad(mtz,pdbid,PDB,seq,"AX",resolution,path_name)
+                # runMRsad(mtz,pdbid,PDB,seq,"AX",resolution,path_name)
                 mrSAD_subStruc=os.path.join(full_path,pdbid+path_name+".1.pdb")
 
                 ### spliting the substructure into combination of multiple PDB files
@@ -66,38 +68,32 @@ if (__name__ == "__main__"):
                     os.makedirs(os.path.join(full_path,"SADphaser"))
                 os.chdir(os.path.join(full_path,"SADphaser"))
                 path_name=(path_name+"_SADphaser")
-                runSADphaser(mtz,pdbid,mrSAD_subStruc,seq, atom_type, wave_length, path_name)
+                # runSADphaser(mtz,pdbid,mrSAD_subStruc,seq, atom_type, wave_length, path_name,None)
                 os.chdir(full_path)
-
-                ##running SADphaser for each of the top combinations
-                SADphaser_args=[]
-                for file_name in glob.glob('*_.pdb'):
-                    subStruc_combination_file_path=os.path.join(full_path,file_name)
-                    subStruc_path_name=(path_name+"_"+str(file_name.rsplit('.',1)[0]))
-                    dir_path=os.path.join(full_path,str(file_name.rsplit('.',1)[0]))
-                    SADphaser_args.append([mtz,pdbid,subStruc_combination_file_path,seq,atom_type,wave_length,subStruc_path_name,dir_path])
-
-                ##run SADphaser in parallel using multiprocessing
-                pool=Pool(nproc)
-                pool.map(multi_run_wrapper,SADphaser_args)
-            except:
-                pass
-        if path_name=="_pc_mrSAD_SADphaser":
-            ##run SADphaser inside mrSAD
-            try:
-
+        #
+        #         ##running SADphaser for each of the top combinations
+        #         SADphaser_args=[]
+        #         for file_name in glob.glob('*_.pdb'):
+        #             subStruc_combination_file_path=os.path.join(full_path,file_name)
+        #             subStruc_path_name=(path_name+"_"+str(file_name.rsplit('.',1)[0]))
+        #             dir_path=os.path.join(full_path,str(file_name.rsplit('.',1)[0]))
+        #             SADphaser_args.append([mtz,pdbid,subStruc_combination_file_path,seq,atom_type,wave_length,subStruc_path_name,dir_path])
+        #
+        #         ##run SADphaser in parallel using multiprocessing
+        #         # pool=Pool(nproc)
+        #         # pool.map(multi_run_wrapper,SADphaser_args)
             except:
                 pass
         if path_name=="_pc_SADphaser":
             ##run SADphaser using the original substructure
             try:
-                runSADphaser(mtz,pdbid,subStruc,seq, atom_type, wave_length, path)
+                # runSADphaser(mtz,pdbid,subStruc,seq, atom_type, wave_length, path_name,None)
             except:
                 pass
         if path_name=="_default_shelx":
             ##run shelx
             try:
-                runShelx(mtz,pdbid,seq,atom_type,wave_length,solvent_content,resolution,path_name)
+                # runShelx(mtz,pdbid,seq,atom_type,wave_length,solvent_content,resolution,path_name)
                 shelx_subStruc=os.path.join(full_path,pdbid+path_name+"_fa.pdb")
 
                 ### spliting the substructure into combination of multiple PDB files
@@ -108,7 +104,7 @@ if (__name__ == "__main__"):
                     os.makedirs(os.path.join(full_path,"SADphaser"))
                 os.chdir(os.path.join(full_path,"SADphaser"))
                 path_name=(path_name+"_SADphaser")
-                runSADphaser(mtz,pdbid,shelx_subStruc,seq, atom_type, wave_length, path_name, None)
+                # runSADphaser(mtz,pdbid,shelx_subStruc,seq, atom_type, wave_length, path_name, None)
                 os.chdir(full_path)
 
                 ##running SADphaser for each of the top combinations
@@ -122,14 +118,12 @@ if (__name__ == "__main__"):
                 ##run SADphaser in parallel using multiprocessing
                 pool=Pool(nproc)
                 pool.map(multi_run_wrapper,SADphaser_args)
-                print("the agruments for SADphaser is run and completed... jinga la la ho")
-
             except:
                 pass
         if path_name=="_default_autosol":
             ##run autosol without substructure information
             try:
-                runAutosol(mtz, seq, None, atom_type, wave_length,path)
+                runAutosol(mtz, seq, None, atom_type, wave_length,path_name)
             except:
                 pass
         if path_name=="_default_phassade":

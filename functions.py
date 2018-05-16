@@ -19,9 +19,10 @@ def runSADphaser(mtz,pdbid,PDB,seq, atom_type, wave_length,path,dir_path) :
     '''
     from phaser import *
     from cctbx import xray
+    print("path_name is", path)
     if dir_path is None:
         ##run outside
-        print("the current path is: "+path)
+
         i = InputEP_DAT()
         HKLIN = mtz
         xtalid = pdbid
@@ -65,7 +66,7 @@ def runSADphaser(mtz,pdbid,PDB,seq, atom_type, wave_length,path,dir_path) :
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         os.chdir(dir_path)
-        print("the current path is: "+path)
+
         i = InputEP_DAT()
         HKLIN = mtz
         xtalid = pdbid
@@ -124,7 +125,7 @@ def runMRsad(mtz,pdbid,PDB,seq,atom_type,wave_length,path) :
     from phaser import *
     from cctbx import xray
     import os, sys
-    print("the current path is: "+path)
+    print("path_name is", path)
     # original=sys.stdout
     # sys.stdout=open('log.txt','w')
     i = InputEP_DAT()
@@ -181,7 +182,7 @@ def runPhassade(mtz,pdbid,seq,atom_type,wave_length,path) :
     from phaser import *
     from cctbx import xray
     path=path
-    print("the current path is: "+path)
+    print("path_name is", path)
     i = InputEP_DAT()
     HKLIN = mtz
     xtalid = pdbid
@@ -228,7 +229,7 @@ def runShelx(mtz,pdbid,seq,atom_type,wave_length,solvent_content,resolution,path
     import os
     assert os.path.isfile(mtz)
     from iotbx import crystal_symmetry_from_any
-    print("the current path is: "+path)
+    print("path_name is", path)
     crystal_data=crystal_symmetry_from_any.extract_from(mtz)
     solvent_content=str(solvent_content)
     resolution=str(resolution)
@@ -259,37 +260,3 @@ def runShelx(mtz,pdbid,seq,atom_type,wave_length,solvent_content,resolution,path
     sedReplace='sed -i \'s/replace_input_data/'+sca+'/\' ' +pdbid+'.sh'
     os.system(sedReplace)
     os.system('sh ' +pdbid+'.sh' + ">"+path+"shelx.log" )
-
-##Analysing functions
-def runEmma(referencePDB, currentPDB,path):
-    '''
-    This function compares two substructures
-    '''
-    from iotbx import crystal_symmetry_from_any
-    import iotbx.pdb
-    from iotbx.cns import sdb_reader
-    from iotbx.kriber import strudat
-    from iotbx.option_parser import option_parser
-    from cctbx import euclidean_model_matching as emma
-    import sys, os
-    import cctbx.xray
-    from iotbx.command_line import emma
-    emma.run(referencePDB, currentPDB)
-
-def runCC_MTZ_PDB(currentMTZ, referencePDB,path):
-    '''
-    This function generates correlation coefficient by comparing structure
-    factors against a PDB model
-    '''
-    from phenix.command_line import get_cc_mtz_pdb
-    print("this is currentMTZ: ", currentMTZ)
-    print("this is referencePDB: ", referencePDB)
-    obj=get_cc_mtz_pdb.get_cc_mtz_pdb([currentMTZ, referencePDB])
-
-def runExpand2P1(PDB):
-    '''
-    This function was provided by Rober Offner.  It expands the structure into
-    P1 space group.
-    '''
-    import ExpandASU
-    ExpandASU.ExpandASUToP1(PDB, 1, 1, 1, 0)
