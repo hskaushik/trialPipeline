@@ -73,7 +73,9 @@ def sortOccupancy(PDB):
         iterableList=itertools.combinations(sorted_atoms[0:5],2)
         counter=int(1)
         for e in list(iterableList):
-            atoms2pdb(e).write_pdb_file(file_name="combination"+str(counter)+"_.pdb")
+            atoms2pdb(e).write_pdb_file(file_name="combination"+str(counter)+"_.pdb",
+                crystal_symmetry=pdb_in.input.crystal_symmetry(),
+                append_end=True)
             counter=counter+1
     else:
         print("occupancy is lower than 0.5")
