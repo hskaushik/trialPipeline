@@ -69,6 +69,11 @@ def sortOccupancy(PDB):
             mylist.append(obj_pdb.atoms()[e])
         sorted_atoms=sorted(mylist, key=lambda thisatom:thisatom.occ, reverse=True)
         atoms2pdb(sorted_atoms).write_pdb_file(file_name="topOcc_.pdb")
+        ##the following will generate PDB for each atom in the topOcc_.pdb file
+        for e in range(0,len(sorted_atoms)):
+            atoms2pdb([sorted_atoms[e]]).write_pdb_file(file_name="topOcc_"+str(e)+"_.pdb",
+            crystal_symmetry=pdb_in.input.crystal_symmetry(),
+            append_end=True)
         ##the following list will generate the combination of the top 5 atoms
         iterableList=itertools.combinations(sorted_atoms[0:5],2)
         counter=int(1)

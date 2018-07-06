@@ -61,7 +61,7 @@ if (__name__ == "__main__"):
                 mrSAD_subStruc=os.path.join(full_path,pdbid+path_name+".1.pdb")
 
                 ### spliting the substructure into combination of multiple PDB files
-                # sortOccupancy(mrSAD_subStruc)
+                sortOccupancy(mrSAD_subStruc)
 
                 ##run SADphaser inside mrSAD
                 if not os.path.exists(os.path.join(full_path,"SADphaser")):
@@ -79,11 +79,12 @@ if (__name__ == "__main__"):
                     dir_path=os.path.join(full_path,str(file_name.rsplit('.',1)[0]))
                     SADphaser_args.append([mtz,pdbid,subStruc_combination_file_path,seq,atom_type,wave_length,subStruc_path_name,dir_path])
                 if len(SADphaser_args)<2:
-                    runSADphaser(mtz,pdbid,subStruc_combination_file_path,seq,atom_type,wave_length,subStruc_path_name,dir_path)
+                    print("skipping due to less than 2 arguments")
+                    # runSADphaser(mtz,pdbid,subStruc_combination_file_path,seq,atom_type,wave_length,subStruc_path_name,dir_path)
                 else:
                     #run SADphaser in parallel using multiprocessing
                     pool=Pool(nproc)
-                    pool.map(multi_run_wrapper,SADphaser_args)
+                    # pool.map(multi_run_wrapper,SADphaser_args)
             except:
                 pass
         # if path_name=="_pc_SADphaser":
@@ -130,7 +131,7 @@ if (__name__ == "__main__"):
         #         if not os.path.exists(os.path.join(full_path,"SADphaser")):
         #             os.makedirs(os.path.join(full_path,"SADphaser"))
         #         os.chdir(os.path.join(full_path,"SADphaser"))
-        #         path_name=(path_name+"_SADphaser")
+        #         path_name=(path_name+"sorted_atoms_SADphaser")
         #         runSADphaser(mtz,pdbid,shelx_subStruc,seq, atom_type, wave_length, path_name, None)
         #         os.chdir(full_path)
         #
@@ -157,7 +158,7 @@ if (__name__ == "__main__"):
         #         pass
         # if path_name=="_default_phassade":
         #     ##run phassade
-        #     try:
+        #     try:sorted_atoms
         #         runPhassade(mtz,pdbid,seq,atom_type,wave_length,path_name)
         #         SADphaser_args=[]
         #         ##for each solution obtained from phassade

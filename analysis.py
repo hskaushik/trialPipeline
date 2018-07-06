@@ -1,3 +1,4 @@
+import sys
 ##Analysing functions
 def runEmma(referencePDB, currentPDB,path):
     '''
@@ -31,6 +32,13 @@ def runExpand2P1(PDB):
     '''
     import ExpandASU
     ExpandASU.ExpandASUToP1(PDB, 1, 1, 1, 0)
+
+def runMolprobity(args, out=sys.stdout):
+    import sys, re
+    from mmtbx.command_line import molprobity
+    molprobity.run(args,out=out)
+    
+
 
 # def atom_count(PDB):
 #     '''
